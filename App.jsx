@@ -986,9 +986,24 @@ const globalStyles = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
 .print-footer { display: none; }
 @media print {
+  @page { margin: 16mm 14mm 26mm 14mm; }
   .no-print { display: none !important; }
-  #printable-report { box-shadow: none !important; border: none !important; }
-  .print-footer { display: block !important; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E4E2D6; font-size: 11px; color: #8B8B7A; font-family: 'IBM Plex Mono', monospace; }
+  #printable-report { box-shadow: none !important; border: none !important; padding-bottom: 70px !important; }
+  .print-footer {
+    display: flex !important;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 10px 14px 8px;
+    border-top: 2px solid #D9D6C9;
+    background: #F4F3EC;
+    font-size: 10px;
+    color: #8B8B7A;
+    font-family: 'IBM Plex Mono', monospace;
+  }
   .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
 }
@@ -1037,7 +1052,7 @@ const styles = {
     margin: "0 0 12px", lineHeight: 1.15,
   },
   h1Sub: {
-    fontFamily: "Inter, sans-serif", fontSize: 14, color: "#6B6B5E", margin: "-6px 0 20px",
+    fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 700, color: "#3A3A32", margin: "-6px 0 20px",
   },
   pIntro: { color: "#4B5563", fontSize: 15.5, lineHeight: 1.6, marginBottom: 20 },
   label: { display: "block", fontSize: 13, color: "#6B6B5E", marginBottom: 6, textAlign: "left" },
