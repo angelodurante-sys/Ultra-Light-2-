@@ -3,7 +3,7 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer, Tooltip
 } from "recharts";
-import { ArrowRight, ArrowLeft, RotateCcw, TrendingUp, TrendingDown, Compass, Pencil, Download, ShieldCheck, Check, Lock, Phone } from "lucide-react";
+import { ArrowRight, ArrowLeft, RotateCcw, TrendingUp, TrendingDown, Compass, Pencil, Download, ShieldCheck, Check, Lock, Phone, Mail } from "lucide-react";
 
 const BRAND = { name: "Adlatus", tagline: "Compass Ultra-Light" };
 
@@ -839,14 +839,18 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           </div>
           <div style={styles.nextStepDuration}>Dauer ca. 45 Minuten</div>
           <div style={styles.nextStepContactBox}>
-            <div>rolf.wicki@adlatus-nwch.ch</div>
-            <div>Tel. +41 (0)79 452 00 21</div>
-          </div>
-          <div style={styles.callPrompt}>
-            <Phone size={13} style={{ marginRight: 6, flexShrink: 0 }} />
-            Rufen Sie uns an, wir beraten Sie gerne.
+            <div style={styles.contactRow}>
+              <span style={styles.contactIconCircle}><Mail size={14} color="#21665A" /></span>
+              <span style={styles.contactText}>rolf.wicki@adlatus-nwch.ch</span>
+            </div>
+            <div style={styles.contactRow}>
+              <span style={styles.contactIconCircle}><Phone size={14} color="#21665A" /></span>
+              <span style={styles.contactText}>+41 (0)79 452 00 21</span>
+            </div>
+            <div style={styles.contactPrompt}>Rufen Sie uns an, wir beraten Sie gerne.</div>
           </div>
         </div>
+
 
         <div className="print-avoid-break" style={styles.closingBox}>
           <ArrowRight size={19} color="#21665A" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -857,11 +861,13 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           </p>
         </div>
 
-        <div className="print-footer" style={styles.printFooter}>
-          <div>{BRAND.name} · {BRAND.tagline}</div>
-          <div>© 2026 ba-confisa</div>
-          <div>Stutzring 6, 4107 Ettingen, Switzerland</div>
-          <div>Version 1.0 · Alle Rechte vorbehalten</div>
+        <div className="print-footer print-avoid-break" style={styles.printFooter}>
+          <div style={styles.printFooterCol}>
+            <div style={styles.printFooterBrand}>{BRAND.tagline}, Version 1.0</div>
+            <div style={styles.printFooterFine}>© 2026 ba-confisa</div>
+            <div style={styles.printFooterFine}>Stutzring 6, 4107 Ettingen, Schweiz</div>
+            <div style={styles.printFooterFine}>Alle Rechte vorbehalten</div>
+          </div>
         </div>
       </div>
 
@@ -986,22 +992,14 @@ const globalStyles = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
 .print-footer { display: none; }
 @media print {
-  @page { margin: 16mm 14mm 26mm 14mm; }
   .no-print { display: none !important; }
-  #printable-report { box-shadow: none !important; border: none !important; padding-bottom: 70px !important; }
+  #printable-report { box-shadow: none !important; border: none !important; }
   .print-footer {
     display: flex !important;
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 4px 16px;
-    padding: 10px 14px 8px;
-    border-top: 2px solid #D9D6C9;
-    background: #F4F3EC;
-    font-size: 10px;
-    color: #8B8B7A;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid #D9D6C9;
+    font-size: 10.5px;
     font-family: 'IBM Plex Mono', monospace;
   }
   .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
@@ -1209,10 +1207,16 @@ const styles = {
     fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: "#6B6B5E", marginBottom: 10,
   },
   nextStepContactBox: {
-    display: "inline-block", fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: "#21665A",
-    fontWeight: 600, marginTop: 10, padding: "10px 16px", border: "1.5px solid #21665A", borderRadius: 8,
-    lineHeight: 1.6,
+    display: "flex", flexDirection: "column", gap: 10, marginTop: 12,
+    padding: "14px 16px", background: "#FFFFFF", border: "1px solid #CFE0DA", borderRadius: 10,
   },
+  contactRow: { display: "flex", alignItems: "center", gap: 10 },
+  contactIconCircle: {
+    width: 28, height: 28, borderRadius: "50%", background: "#EAF2EF",
+    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  contactText: { fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: "#21665A", fontWeight: 600 },
+  contactPrompt: { fontSize: 12.5, color: "#6B6B5E", fontFamily: "Inter, sans-serif", marginTop: 2, paddingLeft: 2 },
   callPrompt: {
     display: "flex", alignItems: "center", fontSize: 12.5, color: "#4B5563",
     fontFamily: "Inter, sans-serif", marginTop: 10,
@@ -1251,6 +1255,9 @@ const styles = {
   scaleLegendLabel: { color: "#FFFFFF", fontSize: 12, fontWeight: 700, fontFamily: "Inter, sans-serif" },
   scaleLegendRange: { color: "#FFFFFF", fontSize: 11, fontFamily: "'IBM Plex Mono', monospace", opacity: 0.9, marginTop: 2 },
   printFooter: {},
+  printFooterCol: { lineHeight: 1.6 },
+  printFooterBrand: { color: "#1B2430", fontWeight: 600 },
+  printFooterFine: { color: "#5B5B52" },
   reviewList: { display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 },
   reviewRow: {
     display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14,
