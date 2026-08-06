@@ -673,6 +673,7 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
   return (
     <div style={{ ...styles.centerWrap, alignItems: "flex-start", paddingTop: 48 }}>
       <div id="printable-report" style={{ ...styles.card, maxWidth: 760 }}>
+        <div style={styles.letterheadBar} />
         <div style={styles.eyebrow}>{BRAND.tagline} Ergebnisbericht</div>
         <h1 style={styles.h1}>{company ? company : "Ihr Unternehmen"}</h1>
         <div style={styles.h1Sub}>Ergebnis Ihrer Selbsteinschätzung</div>
@@ -682,7 +683,7 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           sie ersetzen keine vertiefte Analyse vor{"\u00A0"}Ort.
         </p>
 
-        <div style={styles.gaugeRow}>
+        <div className="print-avoid-break" style={styles.gaugeRow}>
           <Gauge pct={overallPct} label={floor1(overallAvg).toFixed(1)} color={overallTier.color} />
           <div style={styles.gaugeText}>
             <div style={{ marginBottom: 4 }}><TierBadge tier={overallTier} /></div>
@@ -702,7 +703,7 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           </p>
         </div>
 
-        <div style={styles.chartWrap}>
+        <div className="print-avoid-break" style={styles.chartWrap}>
           <ResponsiveContainer width="100%" height={320}>
             <RadarChart data={radarData} outerRadius="58%" margin={{ top: 16, right: 28, bottom: 16, left: 28 }}>
               <PolarGrid stroke="#D9D6C9" />
@@ -718,7 +719,7 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           </ResponsiveContainer>
         </div>
 
-        <div style={styles.barsWrap}>
+        <div className="print-avoid-break" style={styles.barsWrap}>
           {(() => {
             const ranked = [...catScores].sort((a, b) => b.avg - a.avg);
             return ranked.map((c) => {
@@ -743,7 +744,9 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
           })()}
         </div>
 
-        <ScaleLegend />
+        <div className="print-avoid-break">
+          <ScaleLegend />
+        </div>
 
         <div style={styles.twoCol}>
           <div className="print-avoid-break" style={styles.colCard}>
@@ -871,19 +874,19 @@ function Report({ company, catScores, overallPct, overallAvg, overallTier, stren
         <div style={styles.pdfContentsLabel}>Ihr PDF enthält:</div>
         <div style={styles.pdfContentsGrid}>
           <div style={styles.pdfContentsItem}>
-            <TrendingUp size={18} color="#21665A" />
+            <span style={styles.pdfIconCircle}><TrendingUp size={17} color="#21665A" /></span>
             <span>Gesamtauswertung</span>
           </div>
           <div style={styles.pdfContentsItem}>
-            <Compass size={18} color="#21665A" />
+            <span style={styles.pdfIconCircle}><Compass size={17} color="#21665A" /></span>
             <span>Übersicht der 5 Themenbereiche</span>
           </div>
           <div style={styles.pdfContentsItem}>
-            <ShieldCheck size={18} color="#21665A" />
+            <span style={styles.pdfIconCircle}><ShieldCheck size={17} color="#21665A" /></span>
             <span>Zusammenfassung & Interpretation</span>
           </div>
           <div style={styles.pdfContentsItem}>
-            <ArrowRight size={18} color="#21665A" />
+            <span style={styles.pdfIconCircle}><ArrowRight size={17} color="#21665A" /></span>
             <span>Handlungsempfehlungen</span>
           </div>
         </div>
@@ -985,8 +988,9 @@ const globalStyles = `
 @media print {
   .no-print { display: none !important; }
   #printable-report { box-shadow: none !important; border: none !important; }
-  .print-footer { display: block !important; margin-top: 24px; font-size: 11px; color: #8B8B7A; font-family: 'IBM Plex Mono', monospace; }
+  .print-footer { display: block !important; margin-top: 24px; padding-top: 16px; border-top: 1px solid #E4E2D6; font-size: 11px; color: #8B8B7A; font-family: 'IBM Plex Mono', monospace; }
   .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
 }
 `;
 
@@ -1015,6 +1019,10 @@ const styles = {
     border: "1px solid #E4E2D6",
     boxSizing: "border-box",
   },
+  letterheadBar: {
+    height: 6, margin: "-40px -36px 32px -36px", borderRadius: "15px 15px 0 0",
+    background: "linear-gradient(90deg, #21665A 0%, #B8863D 100%)",
+  },
   gaugeIconWrap: {
     width: 52, height: 52, borderRadius: "50%", background: "#21665A",
     display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
@@ -1041,8 +1049,12 @@ const styles = {
     display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24,
   },
   pdfContentsItem: {
-    display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "#1B2430",
+    display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, color: "#1B2430",
     fontFamily: "Inter, sans-serif", lineHeight: 1.3,
+  },
+  pdfIconCircle: {
+    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+    width: 34, height: 34, borderRadius: "50%", background: "#EAF2EF",
   },
   trustLine: {
     display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5,
@@ -1128,7 +1140,10 @@ const styles = {
     marginTop: 22, background: "none", border: "none", color: "#8B8B7A", cursor: "pointer",
     fontSize: 13.5, display: "inline-flex", alignItems: "center", fontFamily: "'Inter', sans-serif",
   },
-  gaugeRow: { display: "flex", alignItems: "center", gap: 24, margin: "24px 0 8px", flexWrap: "wrap" },
+  gaugeRow: {
+    display: "flex", alignItems: "center", gap: 24, margin: "24px 0 20px", flexWrap: "wrap",
+    background: "#FBFAF7", border: "1px solid #E4E2D6", borderRadius: 14, padding: "20px 24px",
+  },
   gaugeText: { flex: 1, minWidth: 200 },
   gaugeSub: { color: "#6B6B5E", fontSize: 14, lineHeight: 1.5 },
   gaugeFootnote: { color: "#9B9A8C", fontSize: 12, lineHeight: 1.5, marginTop: 4, fontStyle: "italic" },
