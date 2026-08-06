@@ -376,9 +376,10 @@ function Intro({ company, setCompany, onStart, resumeAvailable, onResume, onDisc
           ))}
         </div>
         <div style={styles.copyrightLine}>
+          <div>{BRAND.tagline}, Version 1.0</div>
           <div>© 2026 ba-confisa</div>
-          <div>Stutzring 6, 4107 Ettingen, Switzerland</div>
-          <div>Version 1.0 · Alle Rechte vorbehalten</div>
+          <div>Stutzring 6, 4107 Ettingen, Schweiz</div>
+          <div>Alle Rechte vorbehalten</div>
         </div>
       </div>
     </div>
