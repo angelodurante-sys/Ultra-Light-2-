@@ -6,7 +6,7 @@ import { RotateCcw, Pencil, Download, Check, Mail, TrendingUp, TrendingDown } fr
 
 /* ══════════════════════════════════════════════════════════════════════════
    COMPANY COMPASS — Adlatus / ba-confisa
-   Version 0.2 · Build 02 (11.08.2026)
+   Version 0.2 · Build 08 (11.08.2026)
 
    BUILD-NUMMER: Bei jeder Fassung, die Claude liefert, zählt BUILD um eins
    hoch. Sie erscheint unten im Fuss der App — so lässt sich jederzeit
@@ -45,7 +45,7 @@ const BRAND = {
 };
 
 // Bei jeder neuen Fassung hochzählen.
-const BUILD = "02";
+const BUILD = "08";
 const BUILD_DATE = "11.08.2026";
 
 const FOOTER = {
@@ -703,6 +703,25 @@ function Intro({ company, setCompany, onStart, resumeAvailable, resumeInfo, onRe
 
 function Quiz({ current, qi, total, selected, onSelect, onNext, onBack, editMode }) {
   const pct = Math.round(((qi + 1) / total) * 100);
+  const isLast = qi === total - 1;
+
+  // Auf der letzten Frage und beim gezielten Nachbearbeiten bleibt der Knopf
+  // stehen: dort ist der nächste Schritt kein blosser Frageweschsel.
+  const autoAdvance = !editMode && !isLast;
+  const timer = useRef(null);
+
+  // Ausstehenden Sprung verwerfen, wenn die Frage wechselt oder die
+  // Komponente verschwindet — sonst springt es nach einem Zurück-Klick weiter.
+  useEffect(() => () => clearTimeout(timer.current), [qi]);
+
+  function choose(v) {
+    onSelect(v);
+    if (!autoAdvance) return;
+    // Kurze Pause, damit die getroffene Wahl noch sichtbar aufleuchtet.
+    clearTimeout(timer.current);
+    timer.current = setTimeout(onNext, 320);
+  }
+
   return (
     <div style={styles.centerWrap}>
       <div style={{ ...styles.card, maxWidth: 520 }}>
@@ -727,7 +746,8 @@ function Quiz({ current, qi, total, selected, onSelect, onNext, onBack, editMode
           {SCALE.map((s) => {
             const active = selected === s.v;
             return (
-              <button key={s.v} onClick={() => onSelect(s.v)}
+              <button key={s.v}
+                onClick={(e) => { choose(s.v); e.currentTarget.blur(); }}
                 style={{ ...styles.scaleBtn, ...(active ? styles.scaleBtnActive : {}) }}>
                 <span style={{ ...styles.scaleNum, ...(active ? styles.scaleNumActive : {}) }}>{s.v}</span>
                 <span>{s.label}</span>
@@ -736,15 +756,17 @@ function Quiz({ current, qi, total, selected, onSelect, onNext, onBack, editMode
           })}
         </div>
 
-        <div style={styles.navRow}>
-          <button style={styles.linkBtn} onClick={onBack}>
+        <div style={{ ...styles.navRow, justifyContent: autoAdvance ? "flex-start" : "space-between" }}>
+          <button style={styles.linkBtn} onClick={() => { clearTimeout(timer.current); onBack(); }}>
             {editMode ? "Zurück zur Übersicht" : "Zurück"}
           </button>
-          <button
-            style={{ ...styles.primaryBtnInline, opacity: selected ? 1 : 0.45, cursor: selected ? "pointer" : "not-allowed" }}
-            onClick={() => selected && onNext()} disabled={!selected}>
-            Weiter
-          </button>
+          {!autoAdvance && (
+            <button
+              style={{ ...styles.primaryBtnInline, opacity: selected ? 1 : 0.45, cursor: selected ? "pointer" : "not-allowed" }}
+              onClick={() => selected && onNext()} disabled={!selected}>
+              {isLast && !editMode ? "Ergebnis anzeigen" : "Weiter"}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -857,7 +879,7 @@ function Teaser({ onNext }) {
         </div>
 
         <div style={styles.goldRuleWide} />
-        <button style={styles.primaryBtn} onClick={onNext}>Meine Auswertung senden</button>
+        <button style={styles.primaryBtn} onClick={onNext}>Meine Auswertung erhalten</button>
         <div style={styles.metaLine}>Nur E-Mail erforderlich</div>
       </div>
     </div>
@@ -908,7 +930,7 @@ function EmailGate({ email, setEmail, payload, onSent }) {
 
         <button style={{ ...styles.primaryBtn, opacity: state === "sending" ? 0.6 : 1 }}
           onClick={submit} disabled={state === "sending"}>
-          {state === "sending" ? "Wird gesendet …" : "Meine Auswertung erhalten"}
+          {state === "sending" ? "Wird gesendet …" : "Meine Auswertung senden"}
         </button>
 
         {state === "error" && (
@@ -1032,12 +1054,12 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
             {summaryLines.map((l, i) => <p key={i} style={styles.summaryLine}>{l}</p>)}
           </div>
 
-          <p style={{ ...styles.reportLead, marginTop: 14 }}>{SUMMARY_OUTRO}</p>
-
-          <p style={styles.reportLeadStrong}>
+          <p style={{ ...styles.reportLeadStrong, marginTop: 14 }}>
             Für eine vertiefte Einordnung Ihrer Ergebnisse steht Ihnen ein erfahrener
             Adlatus-Berater zur Verfügung.
           </p>
+
+          <p style={styles.reportLead}>{SUMMARY_OUTRO}</p>
         </div>
         <Foot n={1} withAddress />
       </section>
@@ -1094,9 +1116,9 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
           <div style={styles.leselogik}>
             <div style={styles.leselogikTitle}>Leselogik</div>
             <p style={styles.leselogikText}>
-              Rot markiert Bereiche mit deutlichem Handlungsbedarf, Gold und Orange zeigen
-              Bereiche, bei denen eine vertiefte Betrachtung besonders lohnend sein kann, Grün
-              markiert Bereiche mit einer bereits guten Grundlage.
+              Rot markiert Bereiche mit deutlichem Handlungsbedarf, Orange und Gelb zeigen
+              Bereiche, bei denen eine vertiefte Betrachtung besonders lohnend sein kann,
+              Hellgrün und Dunkelgrün markieren Bereiche mit einer bereits guten Grundlage.
             </p>
           </div>
         </div>
@@ -1108,10 +1130,6 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
         <div style={styles.sheetBody}>
           <h2 style={styles.sheetTitle}>Stärken & Handlungsfelder</h2>
           <p style={styles.sheetIntro}>
-            Die wichtigsten Ergebnisse werden bewusst priorisiert, damit Sie rasch erkennen,<br />
-            wo Sie ansetzen können.
-          </p>
-          <p style={styles.sheetNote}>
             Stärken zeigen die zwei am besten bewerteten Bereiche, Handlungsfelder die zwei mit dem
             grössten Potenzial — unabhängig von der absoluten Bewertungsstufe. Bei einer Bewertung
             von Professionell oder Exzellent werden keine Massnahmen empfohlen.
@@ -1145,16 +1163,20 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
         <div style={styles.sheetBody}>
           <h2 style={styles.sheetTitle}>Von der Standortbestimmung zur Umsetzung</h2>
           <p style={styles.sheetIntro}>
-            Der Company Compass gibt Ihnen eine erste Standortbestimmung. Welche Massnahmen für Ihr
-            Unternehmen die grösste Wirkung erzielen, hängt von Ihrer individuellen Situation und
-            Ihren Prioritäten ab – im persönlichen Gespräch mit einem erfahrenen Adlatus-Berater
-            lassen sich diese gezielt einordnen.
+            Die Standortbestimmung zeigt, wo Sie stehen. Die schwierigere Frage ist, wo Sie zuerst
+            anpacken sollen.
           </p>
-          <p style={styles.sheetHighlight}>Die Interpretation Ihrer Ergebnisse ist im Erstgespräch kostenlos.</p>
+          <p style={styles.sheetIntro}>
+            Im Gespräch gehen Sie Ihre Ergebnisse durch, unterscheiden zwischen dringend und wichtig
+            und fixieren zwei bis drei Schritte, die in Ihrer Situation wirklich etwas bewegen.
+            Unsere Beraterinnen und Berater bringen langjährige Führungserfahrung aus der
+            Wirtschaft mit – sie kennen diese Situationen aus der Praxis.
+          </p>
+          <p style={styles.sheetHighlight}>Das Erstgespräch ist kostenlos und unverbindlich.</p>
 
           <div style={styles.contactBox}>
             <Wordmark compact />
-            <div style={styles.contactLabel}>IHR KONTAKT</div>
+            <div style={styles.contactLabel}>Ihr Kontakt</div>
             <div style={styles.contactRole}>{CONTACT.role}</div>
             <div style={styles.contactName}>{CONTACT.name}</div>
             <div style={styles.contactLine}>{CONTACT.city}</div>
@@ -1568,8 +1590,8 @@ const styles = {
   summaryLine: { fontSize: "calc(13 * var(--rs))", lineHeight: 1.62, color: INK, margin: "0 0 6px" },
 
   sheetTitle: { color: BLUE, fontSize: "calc(23 * var(--rs))", fontWeight: 700, margin: "0 0 9px", textAlign: "center" },
-  sheetIntro: { fontSize: "calc(13 * var(--rs))", lineHeight: 1.6, color: "#5C6169", margin: "0 auto 6px", textAlign: "center", maxWidth: "125mm" },
-  sheetNote: { fontSize: "calc(12 * var(--rs))", lineHeight: 1.6, color: MUTED, margin: "0 auto 16px", textAlign: "center", maxWidth: "140mm" },
+  sheetIntro: { fontSize: "calc(13 * var(--rs))", lineHeight: 1.6, color: "#5C6169", margin: "0 auto 8px", textAlign: "center", maxWidth: "132mm" },
+  sheetNote: { fontSize: "calc(13 * var(--rs))", lineHeight: 1.6, color: MUTED, margin: "0 auto 16px", textAlign: "center", maxWidth: "140mm" },
   sheetHighlight: { fontSize: "calc(14 * var(--rs))", fontWeight: 700, color: INK, margin: "14px 0 0", textAlign: "center" },
 
   radarWrap: { display: "flex", justifyContent: "center", margin: "6px 0 4px" },
@@ -1604,10 +1626,10 @@ const styles = {
   actionRow: { display: "flex", alignItems: "flex-start", gap: 6, fontSize: "calc(11.5 * var(--rs))", lineHeight: 1.5, color: "#5C6169", marginBottom: 3 },
 
   contactBox: { marginTop: 26, border: `1px solid ${LINE}`, borderRadius: 12, padding: "20px 22px", background: "#FBF9F3", textAlign: "center" },
-  contactLabel: { fontSize: "calc(22 * var(--rs))", fontWeight: 700, letterSpacing: "2px", color: BLUE, marginTop: 16 },
-  contactRole: { fontSize: "calc(12 * var(--rs))", color: MUTED, marginTop: 9 },
-  contactName: { fontSize: "calc(17 * var(--rs))", fontWeight: 700, color: INK, marginTop: 2 },
-  contactLine: { fontSize: "calc(12.5 * var(--rs))", color: "#5C6169", marginTop: 3 },
+  contactLabel: { fontSize: "calc(13 * var(--rs))", fontWeight: 700, letterSpacing: "1.4px", color: BLUE, marginTop: 16 },
+  contactRole: { fontSize: "calc(13 * var(--rs))", color: MUTED, marginTop: 9 },
+  contactName: { fontSize: "calc(18 * var(--rs))", fontWeight: 700, color: INK, marginTop: 2 },
+  contactLine: { fontSize: "calc(13.5 * var(--rs))", color: "#5C6169", marginTop: 3 },
 
   critBox: { border: "1px solid", borderRadius: 12, padding: "20px 22px" },
   critBoxTitle: { color: BLUE, fontSize: "calc(20 * var(--rs))", fontWeight: 700, margin: "0 0 9px", textAlign: "center" },
@@ -1637,6 +1659,7 @@ const globalCss = `
   button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
     outline: 2px solid ${BLUE}; outline-offset: 2px;
   }
+  button:focus:not(:focus-visible) { outline: none; }
   input::placeholder, textarea::placeholder { color: #B4B0A4; }
 
   @media (max-width: 900px) {
@@ -1657,13 +1680,21 @@ const globalCss = `
   @media print {
     html, body { background: #FFFFFF !important; margin: 0; padding: 0; }
     :root, .a4 { --rs: 1px !important; }
+
+    /* Hintergrundfarben auch dann drucken, wenn der Nutzer die Option
+       "Hintergrundgrafiken" im Druckdialog nicht selbst aktiviert. */
+    .a4, .a4 * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
     .no-print { display: none !important; }
     .dev-only { display: none !important; }
 
     .a4 {
       width: 210mm !important;
-      height: 297mm !important;
-      min-height: 297mm !important;
+      height: 296mm !important;
+      min-height: 296mm !important;
       box-shadow: none !important;
       margin: 0 !important;
       page-break-after: always;
