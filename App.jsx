@@ -44,13 +44,29 @@ const BRAND = {
   subline: "Ihre kostenlose digitale Standortbestimmung",
 };
 
-// Bei jeder neuen Fassung hochzählen.
-const BUILD = "08";
+/* ── Versionierung ──────────────────────────────────────────────────────────
+   VERSION  zählt die Meilensteine. Sie wechselt selten und nur dann, wenn
+            sich inhaltlich Grundlegendes ändert:
+              0.2  interne Testphase (Backend fehlt, Texte in Arbeit)
+              0.3  nach Einarbeitung von Rolfs Rückmeldung
+              1.0  Livegang: Backend angeschlossen, eigene Adresse
+   BUILD    zählt fortlaufend hoch — bei jeder ausgelieferten Fassung um
+            eins, unabhängig von der Version. Er wird NIE zurückgesetzt:
+            nur so bleibt jede Nummer für immer eindeutig und eine Aussage
+            wie "Fehler trat in Build 38 auf, behoben mit Build 39" ist
+            ohne weitere Angaben verständlich.
+
+   Beide erscheinen im Fuss der App und auf Seite 1 des Berichts — so lässt
+   sich jederzeit feststellen, welcher Stand gerade live ist.
+   ────────────────────────────────────────────────────────────────────────── */
+const VERSION = "0.2";
+const BUILD = "10";
 const BUILD_DATE = "11.08.2026";
 
 const FOOTER = {
   line1: "ba-confisa | Stutzring 6, 4107 Ettingen | Schweiz",
-  line2: `© Copyright | Alle Rechte vorbehalten | Version 0.2 · Build ${BUILD}`,
+  line2: `© Copyright | Alle Rechte vorbehalten | Version ${VERSION}`,
+  build: `Build ${BUILD}`,
 };
 
 const CONTACT = {
@@ -692,7 +708,10 @@ function Intro({ company, setCompany, onStart, resumeAvailable, resumeInfo, onRe
 
         <div style={styles.introFooter}>
           <div>{FOOTER.line1}</div>
-          <div>{FOOTER.line2}</div>
+          <div>
+            {FOOTER.line2}
+            <span style={styles.buildLine}> · {FOOTER.build}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1014,7 +1033,7 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
 
   const Foot = ({ n, withAddress = false }) => (
     <div style={styles.sheetFooter}>
-      {withAddress && <span>{FOOTER.line1}&nbsp;&nbsp;·&nbsp;&nbsp;{FOOTER.line2}&nbsp;({BUILD_DATE})&nbsp;&nbsp;·&nbsp;&nbsp;</span>}
+      {withAddress && <span>{FOOTER.line1}&nbsp;&nbsp;·&nbsp;&nbsp;{FOOTER.line2}&nbsp;&nbsp;·&nbsp;&nbsp;{FOOTER.build}&nbsp;({BUILD_DATE})&nbsp;&nbsp;·&nbsp;&nbsp;</span>}
       <span>Seite {n} von {totalPages}&nbsp;&nbsp;·&nbsp;&nbsp;{stamp}</span>
     </div>
   );
@@ -1427,7 +1446,10 @@ function Conversion({ company, email, onRestart }) {
 
         <div style={styles.introFooter}>
           <div>{FOOTER.line1}</div>
-          <div>{FOOTER.line2}</div>
+          <div>
+            {FOOTER.line2}
+            <span style={styles.buildLine}> · {FOOTER.build}</span>
+          </div>
         </div>
 
         <button style={styles.linkBtnCenter} onClick={onRestart}>
@@ -1508,6 +1530,7 @@ const styles = {
   catNum: { width: 21, height: 21, borderRadius: "50%", background: BLUE, color: "#FFF", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   catLabel: { fontSize: 13.5, color: INK },
 
+  buildLine: { fontSize: 8.5, opacity: 0.75 },
   introFooter: { marginTop: 22, paddingTop: 14, borderTop: `1px solid ${LINE}`, textAlign: "center", fontSize: 10.5, color: MUTED, lineHeight: 1.7, fontFamily: "'SF Mono', Menlo, Consolas, monospace" },
 
   resumeBox: { marginTop: 16, padding: "14px 16px", background: "#FFFDF7", border: `1px solid ${GOLD}`, borderRadius: 10 },
