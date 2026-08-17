@@ -4,7 +4,7 @@ import App from "./App.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <APP />
+    <App />
   </React.StrictMode>
 );
 // V04 Build 12 deployment
