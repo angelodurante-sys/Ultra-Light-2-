@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from "recharts";
-import { RotateCcw, Pencil, Download, Check, Mail, TrendingUp, TrendingDown } from "lucide-react";
+import { RotateCcw, Pencil, Download, Check, Mail, TrendingUp, Target } from "lucide-react";
 
 /* ══════════════════════════════════════════════════════════════════════════
    COMPANY COMPASS — Adlatus / ba-confisa
@@ -59,9 +59,9 @@ const BRAND = {
    Beide erscheinen im Fuss der App und auf Seite 1 des Berichts — so lässt
    sich jederzeit feststellen, welcher Stand gerade live ist.
    ────────────────────────────────────────────────────────────────────────── */
-const VERSION = "0.3";
+const VERSION = "0.2";
 const BUILD = "11";
-const BUILD_DATE = "12.08.2026";
+const BUILD_DATE = "11.08.2026";
 
 const FOOTER = {
   line1: "ba-confisa | Stutzring 6, 4107 Ettingen | Schweiz",
@@ -129,86 +129,81 @@ const CATEGORIES = [
     id: "strategie",
     name: "Strategie",
     short: "Strategie",
-    intro: "Ausrichtung, Ziele und Umsetzung",
     radar: ["Strategie"],
     questions: [
-      { nr: 1, keyword: "Ausrichtung", text: "Wissen Sie, wohin Sie Ihr Unternehmen in den nächsten drei bis fünf Jahren entwickeln möchten?", explain: "Eine klare strategische Richtung hilft, Chancen zu nutzen, Prioritäten zu setzen und fundierte Entscheidungen zu treffen." },
-      { nr: 2, keyword: "Ziele", text: "Sind die wichtigsten Ziele Ihres Unternehmens klar definiert und Ihren Führungskräften bzw. Schlüsselpersonen bekannt?", explain: "Klare Unternehmensziele schaffen Orientierung und sorgen dafür, dass alle Schlüsselpersonen in dieselbe Richtung arbeiten." },
-      { nr: 3, keyword: "Umsetzung", text: "Werden aus Ihren Unternehmenszielen konkrete Massnahmen abgeleitet und deren Umsetzung regelmässig überprüft?", explain: "Ziele schaffen erst dann einen Mehrwert, wenn daraus konkrete Massnahmen entstehen und deren Umsetzung überprüft wird." },
+      { nr: "29", text: "Wissen Sie, wohin Sie Ihr Unternehmen in den nächsten drei bis fünf Jahren entwickeln möchten?", explain: "Eine klare Richtung erleichtert langfristige Entscheidungen. z. B. eine schriftliche 3-Jahres-Planung oder klare Wachstumsziele." },
+      { nr: "28", text: "Haben Sie die wichtigsten Ziele klar definiert und Ihren Führungskräften bzw. Schlüsselpersonen bekannt gemacht?", explain: "Bekannte Ziele richten alle Beteiligten auf dasselbe Ergebnis aus. z. B. in einer Teamsitzung besprochen, schriftlich festgehalten oder publiziert." },
+      { nr: "30", text: "Leiten Sie aus Ihren Zielen konkrete Massnahmen ab und überprüfen deren Umsetzung regelmässig?", explain: "Ziele entfalten erst durch konkrete Massnahmen Wirkung. Denken Sie an einen Massnahmenplan mit Verantwortlichkeiten und regelmässiger Überprüfung." },
     ],
-    critical: { situation: "Eine klare strategische Ausrichtung ist derzeit kaum erkennbar. Ziele und deren Umsetzung sind noch nicht ausreichend miteinander verbunden. Hier besteht prioritärer Handlungsbedarf, um Orientierung und Verbindlichkeit zu schaffen.", actions: ["Strategische Ausrichtung mit der Geschäftsleitung klären und festhalten.", "Wenige zentrale Unternehmensziele definieren und daraus konkrete Massnahmen ableiten."] },
-    low: { situation: "Die wesentlichen strategischen Grundlagen sind teilweise vorhanden, jedoch noch nicht ausreichend klar und konsequent umgesetzt. Eine stärkere Verbindung von Ausrichtung, Zielen und Umsetzung würde die strategische Steuerung deutlich verbessern.", actions: ["Strategische Ausrichtung und wichtigste Ziele kompakt dokumentieren.", "Verantwortlichkeiten für die Umsetzung der wichtigsten Ziele festlegen."] },
-    mid: { situation: "Eine strategische Grundlage ist vorhanden, wird aber noch nicht durchgängig in klare Ziele und konsequente Umsetzung überführt. Eine stärkere Abstimmung dieser Elemente könnte die strategische Wirkung deutlich erhöhen.", actions: ["Ziele und Massnahmen systematischer miteinander verknüpfen.", "Umsetzung und Zielerreichung regelmässig überprüfen."] },
-    solid: { situation: "Ihr Unternehmen verfügt über eine klare strategische Ausrichtung, die weitgehend mit Zielen und konkreten Massnahmen verbunden ist. Damit besteht eine solide strategische Grundlage.", actions: [] },
-    high: { situation: "Ausrichtung, Ziele und Umsetzung sind sehr gut aufeinander abgestimmt. Ihr Unternehmen verfügt damit über eine starke strategische Grundlage. Entscheidend ist, diese Klarheit und Umsetzungskraft auch künftig beizubehalten.", actions: [] },
+    critical: { situation: "Es ist keine erkennbare Strategie vorhanden.", timeframe: "4 Wochen", actions: ["Strategie-Workshop mit der Geschäftsleitung durchführen", "Mindestens 3 schriftliche Ziele für die nächsten 3–5 Jahre festlegen"] },
+    low: { situation: "Erste strategische Überlegungen bestehen, sind aber weder schriftlich festgehalten noch bekannt.", timeframe: "8 Wochen", actions: ["Ziele auf 1–2 Seiten schriftlich festhalten", "Ziele in der nächsten Kadersitzung kommunizieren"] },
+    mid: { situation: "Eine Strategie besteht, wird aber nur unregelmässig überprüft.", timeframe: "3 Monate", actions: ["Fixen Review-Termin festlegen (z. B. quartalsweise)", "Wichtigste Mitarbeitende aktiv informieren"] },
+    solid: { situation: "Ziele sind schriftlich festgehalten, bekannt und werden grösstenteils überprüft.", timeframe: "6 Monate", actions: ["Überprüfung zu festem, dokumentiertem Rhythmus schärfen", "Anpassungen schriftlich festhalten"] },
+    high: { situation: "Strategie und Zielsetzung sind verankert, bekannt und werden konsequent überprüft.", timeframe: "laufend", actions: ["Review-Rhythmus beibehalten", "Strategie aktiv als Entscheidungsgrundlage im Tagesgeschäft nutzen"] },
   },
   {
     id: "fuehrung",
     name: "Führung & Organisation",
     short: "Führung / Organisation",
-    intro: "Verantwortung, Prozesse und Zusammenarbeit",
     radar: ["Führung &", "Organisation"],
     questions: [
-      { nr: 4, keyword: "Verantwortung", text: "Weiss in Ihrem Unternehmen jeder, wer wofür verantwortlich ist und wer welche Entscheidungen treffen darf?", explain: "Klare Verantwortlichkeiten vermeiden Doppelspurigkeiten, beschleunigen Entscheidungen und schaffen Orientierung." },
-      { nr: 5, keyword: "Prozesse", text: "Funktionieren die wichtigsten Abläufe in Ihrem Unternehmen effizient und reibungslos?", explain: "Effiziente Abläufe sparen Zeit, senken Kosten und sorgen für eine gleichbleibend hohe Qualität." },
-      { nr: 6, keyword: "Zusammenarbeit", text: "Funktioniert Ihr Unternehmen auch dann zuverlässig, wenn Schlüsselpersonen oder Mitarbeitende unerwartet ausfallen?", explain: "Gute Zusammenarbeit, klare Stellvertretungen und geteiltes Wissen helfen, personelle Ausfälle aufzufangen und wichtige Aufgaben zuverlässig weiterzuführen." },
+      { nr: "36/39", text: "Wissen alle in Ihrem Unternehmen, wer wofür verantwortlich ist und wer welche Entscheidungen treffen darf?", explain: "Klare Rollen vermeiden Doppelspurigkeiten. z. B. durch ein Organigramm oder klare Stellenbeschreibungen." },
+      { nr: "47/50", text: "Funktionieren Ihre wichtigsten Abläufe effizient und reibungslos?", explain: "Effiziente Abläufe sparen Zeit und Kosten. Denken Sie an wiederkehrende Engpässe, Wartezeiten oder unnötige Arbeitsschritte." },
+      { nr: "54", text: "Könnte Ihr Unternehmen erfolgreich weitergeführt werden, wenn eine Schlüsselperson unerwartet ausfällt?", explain: "Geregelte Stellvertretungen reduzieren Abhängigkeiten. z. B. durch eine dokumentierte Übergabe oder eine zweite Person, die eingearbeitet ist." },
     ],
-    critical: { situation: "Verantwortlichkeiten und wichtige Abläufe sind derzeit noch nicht ausreichend klar bzw. zuverlässig geregelt. Auch die Handlungsfähigkeit bei personellen Ausfällen ist noch nicht ausreichend sichergestellt. Hier besteht prioritärer Handlungsbedarf, um die betriebliche Stabilität zu verbessern.", actions: ["Verantwortlichkeiten und Entscheidungskompetenzen klar festlegen.", "Für wichtige Funktionen Stellvertretungen und Wissenstransfer sicherstellen."] },
-    low: { situation: "Wesentliche organisatorische Grundlagen sind teilweise vorhanden, weisen jedoch noch erkennbare Lücken auf. Klarere Verantwortlichkeiten, verlässlichere Abläufe und eine bessere Vorbereitung auf personelle Ausfälle würden die betriebliche Stabilität deutlich erhöhen.", actions: ["Kritische Abläufe und Zuständigkeiten überprüfen und dokumentieren.", "Stellvertretungen für wichtige Funktionen festlegen und Wissen breiter verfügbar machen."] },
-    mid: { situation: "Verantwortlichkeiten und Abläufe sind grundsätzlich geregelt, funktionieren aber noch nicht in allen Bereichen zuverlässig. Eine gezielte Weiterentwicklung der Organisation und der Umgang mit personellen Ausfällen könnten die betriebliche Stabilität weiter stärken.", actions: ["Schwachstellen in wiederkehrenden Abläufen gezielt verbessern.", "Zusammenarbeit und Stellvertretungen so organisieren, dass personelle Ausfälle besser aufgefangen werden."] },
-    solid: { situation: "Ihr Unternehmen verfügt über weitgehend klare Verantwortlichkeiten und funktionierende Abläufe. Auch personelle Ausfälle können grundsätzlich aufgefangen werden. Damit besteht eine solide organisatorische Grundlage, die es weiter zu festigen gilt.", actions: [] },
-    high: { situation: "Verantwortlichkeiten und Abläufe sind sehr gut geregelt, und Ihr Unternehmen bleibt auch bei personellen Ausfällen handlungsfähig. Damit verfügt es über eine starke organisatorische Grundlage.", actions: [] },
+    critical: { situation: "Aufgaben, Kompetenzen und Verantwortlichkeiten sind faktisch ungeregelt.", timeframe: "4 Wochen", actions: ["Einfaches Organigramm erstellen", "Notfall-Stellvertretung für die Geschäftsleitung benennen"] },
+    low: { situation: "Zuständigkeiten sind teils informell geregelt, eine Nachfolgeplanung fehlt.", timeframe: "8 Wochen", actions: ["2–3 kritischste Prozesse dokumentieren", "Ersten, auch vorläufigen Nachfolgeplan erstellen"] },
+    mid: { situation: "Struktur und Prozesse bestehen teilweise, sind aber nicht durchgängig dokumentiert.", timeframe: "3 Monate", actions: ["Nachfolgeplan schriftlich festhalten", "Fehlende Prozessdokumentationen ergänzen"] },
+    solid: { situation: "Verantwortlichkeiten und Prozesse sind grösstenteils geregelt und dokumentiert.", timeframe: "6 Monate", actions: ["Nachfolgeplan mit konkretem Zeitpunkt formalisieren", "Übergabeschritte festlegen"] },
+    high: { situation: "Verantwortlichkeiten, Prozesse und Nachfolge sind klar geregelt und dokumentiert.", timeframe: "jährlich", actions: ["Organigramm und Nachfolgeplan jährlich auf Aktualität prüfen"] },
   },
   {
     id: "markt",
     name: "Markt & Kunden",
     short: "Markt / Kunden",
-    intro: "Marktposition, Angebot und Kundenorientierung",
     radar: ["Markt &", "Kunden"],
     questions: [
-      { nr: 7, keyword: "Marktposition", text: "Wissen Sie, wie Ihr Unternehmen im Markt positioniert ist und wodurch es sich von seinen wichtigsten Mitbewerbern unterscheidet?", explain: "Eine klare Marktposition hilft, die eigenen Stärken gezielt einzusetzen und sich erfolgreich vom Wettbewerb abzuheben." },
-      { nr: 8, keyword: "Angebot", text: "Ist Ihr Angebot für Ihre Kunden attraktiv und trägt es nachhaltig zum wirtschaftlichen Erfolg Ihres Unternehmens bei?", explain: "Ein attraktives und wirtschaftlich erfolgreiches Angebot bildet die Grundlage für Wettbewerbsfähigkeit und nachhaltigen Unternehmenserfolg." },
-      { nr: 9, keyword: "Kundenorientierung", text: "Kennen Sie die heutigen und zukünftigen Bedürfnisse Ihrer Kunden und richten Sie Ihr Angebot konsequent danach aus?", explain: "Wer Kundenbedürfnisse und Veränderungen frühzeitig erkennt, kann sein Angebot gezielt weiterentwickeln und Kunden langfristig binden." },
+      { nr: "96", text: "Gewinnen Sie regelmässig neue Kunden und können Sie bestehende Kunden langfristig binden?", explain: "Neukunden und Stammkunden sichern die Geschäftsentwicklung. Denken Sie an neue Kunden der letzten 12 Monate und an Kunden, die Ihnen treu bleiben." },
+      { nr: "108", text: "Wissen Sie, wodurch sich Ihr Unternehmen von Ihren wichtigsten Mitbewerbern unterscheidet?", explain: "Klare Positionierung schafft Vorteile. z. B. durch Preis, Service oder Spezialisierung." },
+      { nr: "109", text: "Kennen Sie die heutigen und zukünftigen Bedürfnisse Ihrer Kunden und richten Sie Ihr Angebot danach aus?", explain: "Kenntnis der Kundenbedürfnisse stärkt die Marktposition. Denken Sie an regelmässiges Kundenfeedback oder Marktbeobachtung." },
     ],
-    critical: { situation: "Marktposition, Angebot und Kundenorientierung sind derzeit noch nicht ausreichend aufeinander abgestimmt. Hier besteht prioritärer Handlungsbedarf, um die Wettbewerbsfähigkeit und den wirtschaftlichen Erfolg nachhaltig zu stärken.", actions: ["Eigene Marktposition und wichtigste Wettbewerber systematisch beurteilen.", "Kundenbedürfnisse und Rückmeldungen gezielt erfassen und für das Angebot nutzen."] },
-    low: { situation: "Wesentliche Grundlagen zu Marktposition, Angebot und Kundenorientierung sind teilweise vorhanden, greifen jedoch noch nicht ausreichend ineinander. Eine klarere Positionierung und stärkere Ausrichtung des Angebots an den Kundenbedürfnissen könnten die Wettbewerbsfähigkeit deutlich verbessern.", actions: ["Marktposition und Differenzierung gegenüber Wettbewerbern schärfen.", "Kundenfeedback systematischer erfassen und in die Angebotsentwicklung einbeziehen."] },
-    mid: { situation: "Ihr Unternehmen verfügt über eine grundsätzlich gute Basis bei Marktposition, Angebot und Kundenorientierung. Eine konsequentere Abstimmung dieser Bereiche könnte dazu beitragen, Marktchancen gezielter zu nutzen und den wirtschaftlichen Erfolg weiter zu stärken.", actions: ["Attraktivität und wirtschaftlichen Beitrag des Angebots regelmässig überprüfen.", "Markt- und Kundenerkenntnisse stärker miteinander verbinden."] },
-    solid: { situation: "Ihr Unternehmen ist im Markt gut positioniert, verfügt über ein attraktives Angebot und orientiert sich weitgehend an den Bedürfnissen seiner Kunden. Damit besteht eine solide Grundlage für Wettbewerbsfähigkeit und wirtschaftlichen Erfolg.", actions: [] },
-    high: { situation: "Marktposition, Angebot und Kundenorientierung sind sehr gut aufeinander abgestimmt. Ihr Unternehmen verfügt damit über eine starke Grundlage, um sich im Markt erfolgreich zu behaupten und Kunden langfristig zu überzeugen.", actions: [] },
+    critical: { situation: "Es fehlt eine erkennbare Auseinandersetzung mit Markt, Wettbewerb und Kundenbedürfnissen.", timeframe: "4 Wochen", actions: ["Erste Kundengespräche führen", "Grobübersicht der wichtigsten Mitbewerber erstellen"] },
+    low: { situation: "Markt- und Kundenkenntnis ist punktuell vorhanden, aber nicht systematisch erfasst.", timeframe: "8 Wochen", actions: ["8–10 Kunden- bzw. Win-/Loss-Gespräche führen", "3–5 wichtigste Wettbewerber dokumentieren"] },
+    mid: { situation: "Markt- und Kundenkenntnis ist vorhanden, aber nicht regelmässig aktualisiert.", timeframe: "3 Monate", actions: ["Wiederkehrende Kundenbefragung einführen (z. B. jährlich)", "Wettbewerbsübersicht aktualisieren"] },
+    solid: { situation: "Markt und Kundenbedürfnisse sind gut bekannt, die Erhebung erfolgt aber nicht durchgängig strukturiert.", timeframe: "6 Monate", actions: ["Feste Feedback-Schlaufen institutionalisieren", "Wettbewerbs-Updates einplanen"] },
+    high: { situation: "Markt-, Wettbewerbs- und Kundenkenntnis sind ausgeprägt und werden aktiv gepflegt.", timeframe: "laufend", actions: ["Wissen systematisch für Angebots- und Preisentscheide nutzen"] },
   },
   {
     id: "steuerung",
     name: "Unternehmungssteuerung",
     short: "Unternehmungssteuerung",
-    intro: "Digitalisierung, Kennzahlen und Steuerung",
     radar: ["Unternehmungs-", "steuerung"],
     questions: [
-      { nr: 10, keyword: "Digitalisierung", text: "Unterstützen Ihre IT-Systeme und digitalen Lösungen die täglichen Arbeitsabläufe wirksam und effizient?", explain: "Moderne IT und digitale Lösungen sollen die Arbeit vereinfachen, Fehler reduzieren und die Effizienz steigern." },
-      { nr: 11, keyword: "Führungskennzahlen", text: "Verfügen Sie rechtzeitig über die wichtigsten Kennzahlen, um fundierte Entscheidungen treffen zu können?", explain: "Aktuelle Kennzahlen schaffen Transparenz und bilden die Grundlage für fundierte und rechtzeitige Entscheidungen." },
-      { nr: 12, keyword: "Finanzielle Steuerung", text: "Überwachen Sie Budget, Liquidität und Geschäftsentwicklung regelmässig und leiten Sie bei Bedarf rechtzeitig Massnahmen ein?", explain: "Eine aktive finanzielle Steuerung hilft, Abweichungen und Risiken frühzeitig zu erkennen und rechtzeitig zu handeln." },
+      { nr: "118/119", text: "Unterstützen Sie Ihre täglichen Arbeitsabläufe wirksam mit IT und digitalen Lösungen?", explain: "Gute IT-Unterstützung spart täglich Zeit und reduziert Fehler. z. B. durch digitale Auftragsabwicklung oder automatisierte Prozesse." },
+      { nr: "157", text: "Verfügen Sie rechtzeitig über die wichtigsten Kennzahlen, um fundierte Entscheidungen treffen zu können?", explain: "Kennzahlen schaffen Transparenz. Denken Sie an ein monatliches Kennzahlen-Reporting." },
+      { nr: "158", text: "Überwachen Sie Budget, Liquidität und Geschäftsentwicklung regelmässig und leiten Sie bei Bedarf rechtzeitig Massnahmen ein?", explain: "Frühzeitige Steuerung erhöht Stabilität. z. B. durch ein einfaches Monats-Reporting oder eine Vorschau der nächsten Monate." },
     ],
-    critical: { situation: "Digitale Unterstützung, Führungsinformationen und finanzielle Steuerung sind derzeit noch nicht ausreichend ausgeprägt. Hier besteht prioritärer Handlungsbedarf, um Transparenz zu schaffen und fundierte Entscheidungen rechtzeitig treffen zu können.", actions: ["Wenige entscheidungsrelevante Führungskennzahlen definieren und regelmässig bereitstellen.", "Digitalisierung und finanzielle Steuerung gezielt auf Transparenz und Entscheidungsfähigkeit ausrichten."] },
-    low: { situation: "Wesentliche Grundlagen für eine wirksame Unternehmungssteuerung sind teilweise vorhanden, unterstützen die Führung jedoch noch nicht ausreichend. Eine bessere Nutzung digitaler Lösungen sowie zeitnaher Kennzahlen und Finanzinformationen könnte die Entscheidungsqualität deutlich verbessern.", actions: ["Verfügbarkeit und Aktualität wichtiger Kennzahlen und Finanzinformationen verbessern.", "Digitale Lösungen gezielt dort einsetzen, wo sie Abläufe und Steuerung unterstützen."] },
-    mid: { situation: "Die Grundlagen für eine wirksame Unternehmungssteuerung sind vorhanden, werden aber noch nicht überall konsequent genutzt. Eine gezieltere Nutzung digitaler Lösungen, relevanter Kennzahlen und Finanzinformationen könnte Transparenz und Steuerung weiter verbessern.", actions: ["Führungskennzahlen und finanzielle Informationen systematischer für Entscheidungen nutzen.", "Digitalisierungspotenziale in wichtigen Abläufen gezielt ausschöpfen."] },
-    solid: { situation: "Ihr Unternehmen verfügt über eine gut funktionierende Steuerungsbasis. Digitale Lösungen, Führungskennzahlen und finanzielle Steuerung unterstützen die Unternehmensführung weitgehend zuverlässig und schaffen eine solide Grundlage für fundierte Entscheidungen.", actions: [] },
-    high: { situation: "Digitale Lösungen, Führungskennzahlen und finanzielle Steuerung greifen sehr gut ineinander. Ihr Unternehmen verfügt damit über eine starke Informations- und Entscheidungsgrundlage für eine vorausschauende Unternehmensführung.", actions: [] },
+    critical: { situation: "Es fehlen zeitnahe Kennzahlen, Liquiditätsplanung und wirksame digitale Unterstützung.", timeframe: "4 Wochen", actions: ["Einfaches Dashboard mit 5 Kernkennzahlen aufbauen", "Rollierende 12-Monats-Liquiditätsplanung einführen"] },
+    low: { situation: "Kennzahlen und digitale Tools sind vorhanden, kommen aber verspätet bei der Geschäftsleitung an.", timeframe: "8 Wochen", actions: ["Reporting auf 5–8 Kennzahlen reduzieren", "Fixen monatlichen Liefertermin festlegen"] },
+    mid: { situation: "Reporting und Liquiditätsplanung bestehen, sind aber nicht durchgängig zeitnah.", timeframe: "3 Monate", actions: ["Fixen Liefertermin nach Monatsabschluss definieren", "Fehlende Kennzahlen ergänzen"] },
+    solid: { situation: "Kennzahlen und Liquiditätsplanung stehen weitgehend zeitnah zur Verfügung.", timeframe: "6 Monate", actions: ["Automatisierungspotenzial prüfen", "Erhebungsaufwand weiter senken"] },
+    high: { situation: "Kennzahlen, Budgetkontrolle und Liquiditätsplanung stehen zeitnah und zuverlässig zur Verfügung.", timeframe: "jährlich", actions: ["Periodisch prüfen, ob IT-Tools noch zur Unternehmensgrösse passen"] },
   },
   {
     id: "zukunft",
     name: "Zukunft & Weiterentwicklung",
     short: "Zukunft / Weiterentwicklung",
-    intro: "Mitarbeiter, Risiken und Innovation",
     radar: ["Zukunft &", "Weiterentw."],
     questions: [
-      { nr: 13, keyword: "Mitarbeiterpotenzial", text: "Fördern Sie Ihre Mitarbeitenden gezielt, damit Ihr Unternehmen auch künftig erfolgreich bleibt?", explain: "Qualifizierte und engagierte Mitarbeitende sind eine zentrale Ressource. Gute Rahmenbedingungen und gezielte Entwicklung helfen, ihr Potenzial langfristig zu erhalten und zu nutzen." },
-      { nr: 14, keyword: "Risikomanagement", text: "Kennen Sie die wichtigsten Risiken Ihres Unternehmens und treffen Sie rechtzeitig geeignete Massnahmen?", explain: "Wer Risiken frühzeitig erkennt und gezielt steuert, schützt sein Unternehmen vor unerwarteten Schäden." },
-      { nr: 15, keyword: "Innovation & Weiterentwicklung", text: "Entwickeln Sie Ihre Produkte, Dienstleistungen oder Ihr Geschäftsmodell laufend weiter, damit Ihr Unternehmen auch morgen erfolgreich bleibt?", explain: "Kontinuierliche Weiterentwicklung stärkt die Wettbewerbsfähigkeit und ermöglicht es, neue Chancen frühzeitig zu nutzen." },
+      { nr: "141", text: "Fördern Sie Ihre Mitarbeitenden gezielt, damit Ihr Unternehmen auch künftig erfolgreich bleibt?", explain: "Gezielte Mitarbeiterentwicklung stärkt die Zukunftsfähigkeit. z. B. durch Schulungen, Coachings oder regelmässige Entwicklungsgespräche." },
+      { nr: "165", text: "Kennen Sie die wichtigsten Risiken Ihres Unternehmens und treffen Sie rechtzeitig geeignete Massnahmen?", explain: "Früh erkannte Risiken lassen sich besser steuern. z. B. durch eine jährliche Risikoübersicht oder ein einfaches Frühwarnsystem." },
+      { nr: "99", text: "Entwickeln Sie Ihre Produkte, Dienstleistungen oder Ihr Geschäftsmodell laufend weiter, damit Ihr Unternehmen auch morgen erfolgreich bleibt?", explain: "Kontinuierliche Weiterentwicklung stärkt die Wettbewerbsfähigkeit. Denken Sie an die letzte grössere Neuerung in Ihrem Angebot oder Geschäftsmodell." },
     ],
-    critical: { situation: "Mitarbeiterpotenzial, Risikomanagement und Weiterentwicklung sind derzeit noch nicht ausreichend berücksichtigt. Hier besteht prioritärer Handlungsbedarf, um die Zukunftsfähigkeit des Unternehmens zu stärken.", actions: ["Entwicklungsbedarf und Potenziale der Mitarbeitenden systematisch erfassen.", "Wesentliche Risiken sowie zentrale Innovations- und Weiterentwicklungsthemen priorisieren."] },
-    low: { situation: "Wesentliche Grundlagen bei Mitarbeiterpotenzial, Risikomanagement und Weiterentwicklung sind teilweise vorhanden, jedoch noch nicht ausreichend verankert. Eine gezieltere Auseinandersetzung mit diesen Themen könnte die Zukunftsfähigkeit des Unternehmens deutlich verbessern.", actions: ["Mitarbeiterentwicklung stärker an zukünftigen Anforderungen ausrichten.", "Risiken und Innovations-/Weiterentwicklungsthemen regelmässig und strukturiert beurteilen."] },
-    mid: { situation: "Mitarbeiterpotenzial, Risiken und Weiterentwicklung werden grundsätzlich berücksichtigt, aber noch nicht durchgängig vorausschauend angegangen. Eine systematischere Bearbeitung dieser Themen könnte die Zukunftsfähigkeit weiter stärken.", actions: ["Mitarbeiterpotenziale und zukünftige Kompetenzanforderungen stärker miteinander verbinden.", "Risiko- und Innovationsthemen systematischer in die Unternehmensplanung integrieren."] },
-    solid: { situation: "Ihr Unternehmen nutzt das Potenzial seiner Mitarbeitenden, berücksichtigt wesentliche Risiken und treibt seine Weiterentwicklung weitgehend systematisch voran. Damit besteht eine solide Grundlage für die zukünftige Entwicklung.", actions: [] },
-    high: { situation: "Mitarbeiterpotenzial, Risikomanagement und kontinuierliche Weiterentwicklung sind sehr gut verankert. Ihr Unternehmen verfügt damit über eine starke Grundlage, um zukünftige Herausforderungen und Chancen aktiv anzugehen.", actions: [] },
+    critical: { situation: "Risiken sind nicht erfasst, Weiterentwicklung von Mitarbeitenden und Angebot findet kaum statt.", timeframe: "4 Wochen", actions: ["Liste der 5 grössten Risiken erstellen", "Erste Weiterbildungsschritte definieren"] },
+    low: { situation: "Einzelne Risiken sind bekannt, eine systematische Erfassung fehlt.", timeframe: "8 Wochen", actions: ["Liste der 10 wichtigsten Risiken mit Gegenmassnahmen erstellen", "Je einen Weiterbildungsschritt pro Mitarbeitendem definieren"] },
+    mid: { situation: "Risiken und Weiterentwicklung werden teilweise, aber nicht systematisch angegangen.", timeframe: "3 Monate", actions: ["3–5 grösste Risiken schriftlich festhalten", "Jährliche Entwicklungsgespräche vereinbaren"] },
+    solid: { situation: "Risikomanagement und Weiterentwicklung sind weitgehend etabliert.", timeframe: "6 Monate", actions: ["Risikoliste fest im jährlichen Strategie-Review verankern"] },
+    high: { situation: "Risikomanagement, Weiterentwicklung von Mitarbeitenden und Angebot sind aktiv und systematisch verankert.", timeframe: "jährlich", actions: ["Jährlichen Review-Rhythmus beibehalten"] },
   },
 ];
 
@@ -221,10 +216,10 @@ const SCALE = [
 ];
 
 const allQuestions = CATEGORIES.flatMap((c) =>
-  c.questions.map((q, i) => ({ catId: c.id, catName: c.name, qIndex: i, nr: q.nr, keyword: q.keyword, text: q.text, explain: q.explain }))
+  c.questions.map((q, i) => ({ catId: c.id, catName: c.name, qIndex: i, nr: q.nr, text: q.text, explain: q.explain }))
 );
 
-const PROGRESS_KEY = "company-compass-v03";
+const PROGRESS_KEY = "company-compass-v2";
 
 // Ein gespeicherter Entwurf wird nur angeboten, wenn er noch frisch genug ist
 // und genug Substanz hat — sonst fängt man besser neu an.
@@ -251,51 +246,114 @@ function tierFor(avgRaw) {
   return { key: "high", label: "Stark", color: "#1F6B3A" };
 }
 
-// Bei Solide und Stark werden bewusst keine Handlungsimpulse ausgegeben.
+// Ab "Solide" werden bewusst keine Massnahmen mehr ausgegeben.
 function showsActions(tierKey) {
   return tierKey === "critical" || tierKey === "low" || tierKey === "mid";
 }
 
 const TIER_SCALE = [
-  { range: "1,0 – 1,8", label: "Kritisch", color: "#C1392B" },
-  { range: "> 1,8 – 2,6", label: "Lückenhaft", color: "#D9822B" },
-  { range: "> 2,6 – 3,4", label: "Ausbaufähig", color: "#C9A227" },
-  { range: "> 3,4 – 4,2", label: "Solide", color: "#4C9A63" },
-  { range: "> 4,2 – 5,0", label: "Stark", color: "#1F6B3A" },
+  { range: "1.0 – 1.8", label: "Kritisch", color: "#C1392B" },
+  { range: "1.9 – 2.6", label: "Lückenhaft", color: "#D9822B" },
+  { range: "2.7 – 3.4", label: "Ausbaufähig", color: "#C9A227" },
+  { range: "3.5 – 4.2", label: "Solide", color: "#4C9A63" },
+  { range: "4.3 – 5.0", label: "Stark", color: "#1F6B3A" },
 ];
+
+const PRIORITY_LABEL = {
+  critical: "Sofort handeln",
+  low: "Prioritär verbessern",
+  mid: "Gezielt weiterentwickeln",
+  // Solide und Stark erhalten keine Massnahmen — daher auch keinen Tag.
+  solid: "",
+  high: "",
+};
 
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
-/* ─────────────────────── Texte: Score-Vorschau (5) ─────────────────────── */
+/* ─────────────────────── Texte: Score-Vorschau (3) ─────────────────────── */
 
 const PREVIEW_TEXT = {
-  critical: "Ihre Standortbestimmung zeigt in mehreren zentralen Unternehmensbereichen deutlichen Handlungsbedarf. Es empfiehlt sich, die erkannten Themen zu priorisieren und gezielt zu vertiefen.",
-  low: "Ihre Standortbestimmung zeigt eine vorhandene Basis, aber auch relevante Bereiche mit Verbesserungspotenzial. Eine gezielte Vertiefung kann helfen, Prioritäten zu setzen und konkrete Handlungsfelder abzuleiten.",
-  mid: "Ihr Unternehmen verfügt in den betrachteten Bereichen über eine gute Basis. Gleichzeitig zeigen sich Entwicklungspotenziale, die gezielt genutzt werden können, um bestehende Stärken auszubauen und Verbesserungen voranzubringen.",
-  solid: "Ihr Unternehmen ist in den betrachteten Bereichen insgesamt gut aufgestellt. Die Standortbestimmung zeigt eine solide Basis und einzelne Ansatzpunkte für eine gezielte Weiterentwicklung.",
-  high: "Ihr Unternehmen ist in den betrachteten Bereichen sehr gut aufgestellt. Die Ergebnisse zeigen eine starke Basis, auf der Sie die weitere Entwicklung Ihres Unternehmens aufbauen können."
+  critical: "Ihre Standortbestimmung zeigt deutlichen Handlungsbedarf. In mehreren Bereichen bestehen Ansatzpunkte, um die Stabilität und Zukunftsfähigkeit Ihres Unternehmens gezielt zu stärken. Die Auswertung zeigt Ihnen, wo die wichtigsten Potenziale liegen.",
+  low: "Ihr Unternehmen verfügt über eine Grundlage, auf der sich aufbauen lässt. Gleichzeitig zeigt der Company Compass relevantes Entwicklungspotenzial. Die Auswertung zeigt Ihnen, in welchen Bereichen gezielte Verbesserungen die grösste Wirkung entfalten können.",
+  mid: "Ihr Unternehmen ist insgesamt gut aufgestellt. Der Company Compass zeigt gleichzeitig Entwicklungspotenziale, die sich mit gezielten Massnahmen weiter erschliessen lassen. Die Auswertung zeigt Ihnen, in welchen Unternehmensbereichen Ihre grössten Stärken und Potenziale liegen.",
+  solid: "Ihr Unternehmen ist in vielen Bereichen solide aufgestellt. Gleichzeitig bestehen auch auf diesem Niveau Möglichkeiten zur weiteren Optimierung. Die Auswertung zeigt Ihnen Ihre besonderen Stärken und wo zusätzliche Entwicklungschancen bestehen.",
+  high: "Ihr Unternehmen weist insgesamt einen sehr hohen Entwicklungsstand auf. Auch auf diesem Niveau lohnt sich der Blick auf einzelne Bereiche und zukünftige Herausforderungen. Die Auswertung zeigt Ihnen Ihre besonderen Stärken und mögliche Ansatzpunkte für die weitere Entwicklung.",
 };
 
 /* ──────────────────── Texte: Zusammenfassung im Bericht ────────────────── */
 /* Struktur je Stufe: Eröffnung · Stärken-Satz · Schwächen-Satz · Schluss.
    Formulierungen entsprechen den freigegebenen Beispielberichten.          */
 
-const SUMMARY_OUTRO =
-  "Auf den folgenden Seiten sehen Sie Ihre fünf Unternehmungsbereiche und die Detailauswertung Ihrer Ergebnisse.";
+const SUMMARY = {
+  critical: {
+    opener: "Ihre Unternehmung steht an einem wichtigen Wendepunkt.",
+    strength: (n) => `Am weitesten fortgeschritten sind aktuell ${n}.`,
+    weakness: (n) => `Der grösste Handlungsbedarf liegt in ${n}.`,
+    closer: "Mit ersten gezielten Massnahmen kann Ihre Unternehmung bereits kurzfristig spürbar vorankommen.",
+  },
+  low: {
+    opener: "Ihre Unternehmung verfügt über eine Grundlage, auf der sich aufbauen lässt.",
+    strength: (n) => `Am weitesten fortgeschritten sind aktuell ${n}.`,
+    weakness: (n) => `Der grösste Handlungsbedarf liegt in ${n}.`,
+    closer: "Mit gezielten Massnahmen lässt sich in mehreren Bereichen spürbarer Fortschritt erzielen.",
+  },
+  mid: {
+    opener: "Ihre Unternehmung ist auf einem soliden Weg.",
+    strength: (n) => `Besonders positiv fallen ${n} auf.`,
+    weakness: (n) => `Die grössten Potenziale liegen in ${n}.`,
+    closer: "Mit gezielten Massnahmen lässt sich die bestehende Grundlage weiter festigen.",
+  },
+  solid: {
+    opener: "Ihre Unternehmung ist in vielen Bereichen solide aufgestellt.",
+    strength: (n) => `Besonders positiv fallen ${n} auf.`,
+    weakness: (n) => `Etwas mehr Potenzial liegt in ${n}.`,
+    closer: "Auf diesem Niveau lohnt sich der Blick auf einzelne Feinheiten, um das Gesamtbild weiter zu schärfen.",
+  },
+  high: {
+    opener: "Ihre Unternehmung weist insgesamt einen sehr hohen Entwicklungsstand auf.",
+    strength: (n) => `Besonders ausgeprägt zeigen sich ${n}.`,
+    weakness: (n) => `Auch ${n} sind solide aufgestellt.`,
+    closer: "Auch auf diesem Niveau lohnt sich der Blick auf einzelne Bereiche und zukünftige Herausforderungen.",
+  },
+};
 
+const SUMMARY_OUTRO =
+  "Auf den folgenden Seiten sehen Sie Ihre fünf Unternehmungsbereiche, die wichtigsten Stärken und prioritären Handlungsfelder.";
+
+function joinSowie(names) {
+  return names.length > 1 ? names.join(" sowie ") : names[0];
+}
 function joinUnd(names) {
-  if (!names.length) return "";
-  if (names.length === 1) return names[0];
-  return `${names.slice(0, -1).join(", ")} und ${names[names.length - 1]}`;
+  return names.length > 1 ? names.join(" und ") : names[0];
 }
 
 function buildSummary(strengths, weaknesses, overallTier) {
-  const base = PREVIEW_TEXT[overallTier.key];
-  const best = joinUnd(strengths.map((s) => s.name));
-  const low = joinUnd(weaknesses.map((s) => s.name));
-  return [base, `Im Vergleich Ihrer fünf Unternehmungsbereiche liegen ${best} aktuell vorne. Das grösste Potenzial zeigt sich in ${low}.`];
+  const t = SUMMARY[overallTier.key];
+
+  // Sonderfall: selbst die höchsten Bereiche liegen noch in "Kritisch" —
+  // dann keine Differenzierung behaupten, sondern ehrlich benennen.
+  if (tierFor(strengths[0].avg).key === "critical") {
+    return [
+      t.opener,
+      "In allen fünf Unternehmungsbereichen zeigt sich aktuell vergleichbar hoher Handlungsbedarf – differenzierte Stärken sind noch nicht erkennbar.",
+      t.closer,
+    ];
+  }
+  // Spiegelbild: selbst der tiefste Bereich ist noch "Stark".
+  if (tierFor(weaknesses[0].avg).key === "high") {
+    return [
+      t.opener,
+      "Alle fünf Unternehmungsbereiche erreichen durchgehend ein exzellentes Niveau – nennenswerte Schwächen sind aktuell nicht erkennbar.",
+      t.closer,
+    ];
+  }
+  return [
+    t.opener,
+    `${t.strength(joinSowie(strengths.map((s) => s.name)))} ${t.weakness(joinUnd(weaknesses.map((s) => s.name)))}`,
+    t.closer,
+  ];
 }
 
 /* ───────────────────────── Datum / Speicher ────────────────────────────── */
@@ -391,7 +449,7 @@ export default function App() {
 
   const overallTier = tierFor(overallAvg);
   const overallPct = Math.round((overallAvg / 5) * 100);
-  const sorted = [...catScores].sort((a, b) => b.avg - a.avg || CATEGORIES.findIndex((c) => c.id === a.id) - CATEGORIES.findIndex((c) => c.id === b.id));
+  const sorted = [...catScores].sort((a, b) => b.avg - a.avg);
   const strengths = sorted.slice(0, 2);
   const weaknesses = [...sorted].reverse().slice(0, 2);
   const displayName = company.trim() || "Ihr Unternehmen";
@@ -612,10 +670,13 @@ function Intro({ company, setCompany, onStart, resumeAvailable, resumeInfo, onRe
         </h1>
 
         <p style={styles.lead}>
-          15 ausgewählte Kernfragen aus dem 130 Fragen umfassenden Company Check-up geben Ihnen in wenigen Minuten eine erste Standortbestimmung und zeigen, wo Entwicklungspotenzial besteht.
+          15 ausgewählte Kernfragen aus dem über 130 Fragen umfassenden Company-Check-up geben
+          Ihnen in wenigen Minuten eine erste Standortbestimmung zu fünf zentralen Bereichen
+          Ihres Unternehmens.
         </p>
         <p style={styles.lead}>
-          Die fünf Bereiche decken zentrale Themen Ihrer Unternehmensführung kompakt ab.
+          Sie erkennen auf einen Blick, wo Ihr Unternehmen gut aufgestellt ist und wo
+          Entwicklungspotenzial besteht.
         </p>
 
         <div style={styles.goldRuleWide} />
@@ -641,7 +702,7 @@ function Intro({ company, setCompany, onStart, resumeAvailable, resumeInfo, onRe
           {CATEGORIES.map((c, i) => (
             <div key={c.id} style={styles.catRow}>
               <span style={styles.catNum}>{i + 1}</span>
-              <span style={styles.catLabel}><strong>{c.name}</strong><br /><span style={{ fontWeight: 400 }}>{c.intro}</span></span>
+              <span style={styles.catLabel}>{c.short}</span>
             </div>
           ))}
         </div>
@@ -754,7 +815,7 @@ function Review({ answers, onEdit, onConfirm }) {
               <div key={i} style={styles.reviewRow}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={styles.reviewCat}>{q.catName}</div>
-                  <div style={styles.reviewNr}>Frage {i + 1} von 15 · {q.keyword}</div>
+                  <div style={styles.reviewNr}>Nr. {q.nr}</div>
                   <div style={styles.reviewQ}>{q.text}</div>
                   <div style={{ ...styles.reviewAnswer, color: val ? tierFor(val).color : "#C1392B" }}>
                     {val ? `${val} von 5 — ${label}` : "Nicht beantwortet"}
@@ -812,10 +873,10 @@ function Preview({ displayName, overallAvg, overallPct, overallTier, onNext, onR
 /* ══════════════════════ Schritt 4 — Teaser ════════════════════════════════ */
 
 const TEASER_ITEMS = [
-  "Bewertung Ihrer 5 Unternehmungsbereiche",
-  "Einordnung Ihrer Ergebnisse",
+  "Bewertung Ihrer 5 Unternehmensbereiche",
   "Stärken und Entwicklungspotenziale",
-  "Mögliche Handlungsimpulse",
+  "Interpretation der Ergebnisse",
+  "Erste Massnahmen",
 ];
 
 function Teaser({ onNext }) {
@@ -825,7 +886,7 @@ function Teaser({ onNext }) {
         <Wordmark />
         <Eyebrows big="Ihr Ergebnis liegt vor" small={BRAND.product} />
 
-        <h1 style={styles.h1}>Möchten Sie Ihre persönliche Auswertung erhalten?</h1>
+        <h1 style={styles.h1}>Möchten Sie Ihre persönliche Auswertung mit Handlungsempfehlungen erhalten?</h1>
 
         <div style={{ textAlign: "left", marginTop: 18 }}>
           <div style={styles.inhaltLabel}>Inhalt:</div>
@@ -954,96 +1015,17 @@ function Verify({ email, onConfirmed }) {
 
 /* ══════════════════════ Schritt 6 — Bericht (A4) ══════════════════════════ */
 
-const CRITICAL_TEXT = {
-  "1": {
-    "keyword": "Ausrichtung",
-    "1": "Die strategische Ausrichtung ist noch nicht ausreichend klar. Legen Sie fest, wohin sich Ihr Unternehmen in den nächsten Jahren entwickeln soll.",
-    "2": "Die strategische Ausrichtung sollte geschärft werden. Die zukünftige Entwicklung Ihres Unternehmens sollte klarer definiert sein."
-  },
-  "2": {
-    "keyword": "Ziele",
-    "1": "Die wichtigsten Unternehmensziele sind noch nicht ausreichend klar bzw. bekannt. Definieren und kommunizieren Sie die zentralen Ziele verbindlich.",
-    "2": "Die Unternehmensziele sollten näher betrachtet werden. Entscheidend ist, dass sie klar definiert und den relevanten Personen bekannt sind."
-  },
-  "3": {
-    "keyword": "Umsetzung",
-    "1": "Konkrete Massnahmen, Verantwortlichkeiten und deren regelmässige Überprüfung sind noch nicht ausreichend verankert.",
-    "2": "Die Umsetzung der Unternehmensziele sollte verbessert werden. Massnahmen, Verantwortlichkeiten und Überprüfung sollten klarer verankert sein."
-  },
-  "4": {
-    "keyword": "Verantwortung",
-    "1": "Verantwortlichkeiten und Entscheidungskompetenzen sind noch nicht ausreichend klar geregelt. Aufgaben und Befugnisse sollten eindeutig festgelegt und kommuniziert werden.",
-    "2": "Verantwortlichkeiten und Entscheidungskompetenzen sollten überprüft werden. Klare und bekannte Zuständigkeiten stehen im Vordergrund."
-  },
-  "5": {
-    "keyword": "Prozesse",
-    "1": "Die wichtigsten betrieblichen Abläufe sollten gezielt verbessert werden. Im Fokus stehen einfache, zuverlässige und effiziente Prozesse.",
-    "2": "Bei den betrieblichen Abläufen besteht Verbesserungspotenzial. Im Fokus stehen Effizienz und Zuverlässigkeit der wichtigsten Prozesse."
-  },
-  "6": {
-    "keyword": "Zusammenarbeit",
-    "1": "Bei personellen Ausfällen ist die Handlungsfähigkeit des Unternehmens nicht ausreichend sichergestellt. Stellvertretungen und Wissenstransfer sollten gezielt verbessert werden.",
-    "2": "Die Handlungsfähigkeit bei personellen Ausfällen sollte überprüft werden. Achten Sie insbesondere auf Stellvertretungen und Wissenstransfer."
-  },
-  "7": {
-    "keyword": "Marktposition",
-    "1": "Ihre Marktposition und die Differenzierung gegenüber den wichtigsten Mitbewerbern sollten klarer herausgearbeitet werden.",
-    "2": "Die Marktposition sollte geschärft werden. Entscheidend ist eine klare Differenzierung gegenüber den wichtigsten Mitbewerbern."
-  },
-  "8": {
-    "keyword": "Angebot",
-    "1": "Attraktivität und wirtschaftlicher Erfolg des Angebots sollten gezielt verbessert werden. Entscheidend ist, welche Leistungen nachhaltig Wert für Kunden und Unternehmen schaffen.",
-    "2": "Das Angebot sollte näher betrachtet werden. Entscheidend sind seine Attraktivität für Kunden und sein Beitrag zum wirtschaftlichen Erfolg."
-  },
-  "9": {
-    "keyword": "Kundenorientierung",
-    "1": "Kundenbedürfnisse und Rückmeldungen sollten systematischer erkannt und für die Weiterentwicklung des Angebots genutzt werden.",
-    "2": "Die Kundenorientierung sollte weiterentwickelt werden. Kundenbedürfnisse und Rückmeldungen sollten systematischer in das Angebot einfliessen."
-  },
-  "10": {
-    "keyword": "Digitalisierung",
-    "1": "Die digitalen Lösungen unterstützen die Arbeitsabläufe noch nicht ausreichend. Identifizieren Sie Bereiche, in denen Digitalisierung konkreten Nutzen und mehr Effizienz schaffen kann.",
-    "2": "Der Nutzen Ihrer digitalen Lösungen sollte überprüft werden. Im Fokus stehen Bereiche, in denen Arbeitsabläufe wirksamer digital unterstützt werden können."
-  },
-  "11": {
-    "keyword": "Führungskennzahlen",
-    "1": "Entscheidungsrelevante Kennzahlen sind noch nicht ausreichend rechtzeitig und verlässlich verfügbar. Die Führungsinformationen sollten gezielt verbessert werden.",
-    "2": "Die Führungsinformationen sollten verbessert werden. Entscheidend ist, dass die wichtigsten Kennzahlen rechtzeitig und in geeigneter Form zur Verfügung stehen."
-  },
-  "12": {
-    "keyword": "Finanzielle Steuerung",
-    "1": "Budget, Liquidität und Geschäftsentwicklung sollten regelmässiger überwacht und notwendige Massnahmen rechtzeitig eingeleitet werden.",
-    "2": "Die finanzielle Steuerung sollte näher betrachtet werden. Budget, Liquidität und Geschäftsentwicklung sollten ausreichend regelmässig überwacht werden."
-  },
-  "13": {
-    "keyword": "Mitarbeiterpotenzial",
-    "1": "Das Potenzial der Mitarbeitenden wird noch nicht ausreichend genutzt. Entwicklung und Förderung sollten gezielter auf die zukünftigen Anforderungen des Unternehmens ausgerichtet werden.",
-    "2": "Die Nutzung des Mitarbeiterpotenzials sollte weiterentwickelt werden. Mitarbeitende sollten gezielt gefördert und weiterentwickelt werden."
-  },
-  "14": {
-    "keyword": "Risikomanagement",
-    "1": "Wesentliche Risiken sollten systematischer erkannt, bewertet und mit geeigneten Massnahmen begrenzt werden.",
-    "2": "Das Risikomanagement sollte überprüft werden. Wesentliche Risiken sollten bekannt sein und geeignete Massnahmen rechtzeitig getroffen werden."
-  },
-  "15": {
-    "keyword": "Innovation & Weiterentwicklung",
-    "1": "Produkte, Dienstleistungen oder Geschäftsmodell sollten systematischer auf zukünftige Anforderungen ausgerichtet und weiterentwickelt werden.",
-    "2": "Die Weiterentwicklung sollte verstärkt werden. Produkte, Dienstleistungen oder Geschäftsmodell sollten ausreichend kontinuierlich weiterentwickelt werden."
-  }
-};
-
-const CRITICALS_PER_PAGE = 8;
+const CRITICALS_PER_PAGE = 7;
 
 function Report({ displayName, date, catScores, overallAvg, overallPct, overallTier, strengths, weaknesses, answers, onNext }) {
   const ranked = [...catScores].sort((a, b) => b.avg - a.avg);
   const radarData = catScores.map((c) => ({ subject: c.id, value: c.avg }));
   const criticals = allQuestions
     .map((q) => ({ ...q, val: answers[`${q.catId}-${q.qIndex}`] }))
-    .filter((q) => q.val === 1 || q.val === 2)
-    .sort((a, b) => a.val - b.val || a.nr - b.nr);
+    .filter((q) => q.val === 1 || q.val === 2);
 
   const criticalPages = [];
-  for (let i = 0; i < Math.ceil(criticals.length / CRITICALS_PER_PAGE); i++) {
+  for (let i = 0; i < Math.max(1, Math.ceil(criticals.length / CRITICALS_PER_PAGE)); i++) {
     criticalPages.push(criticals.slice(i * CRITICALS_PER_PAGE, (i + 1) * CRITICALS_PER_PAGE));
   }
   const totalPages = 4 + criticalPages.length;
@@ -1078,7 +1060,9 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
           </div>
 
           <p style={styles.reportLead}>
-            Die 15 Kernfragen greifen ausgewählte zentrale Themen aus dem 130 Fragen umfassenden Company Check-up auf und ermöglichen eine erste Standortbestimmung.
+            15 sorgfältig ausgewählte Kernfragen aus dem über 130 Fragen umfassenden
+            Company-Check-up geben Ihnen eine Standortbestimmung mit Score, Stärken und ersten
+            Handlungsfeldern.
           </p>
           <div style={{
             ...styles.summaryBox,
@@ -1091,7 +1075,8 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
           </div>
 
           <p style={{ ...styles.reportLeadStrong, marginTop: 14 }}>
-            Eine vertiefte Analyse ermöglicht es, einzelne Unternehmungsbereiche detaillierter zu beurteilen und konkrete Handlungsfelder abzuleiten.
+            Für eine vertiefte Einordnung Ihrer Ergebnisse steht Ihnen ein erfahrener
+            Adlatus-Berater zur Verfügung.
           </p>
 
           <p style={styles.reportLead}>{SUMMARY_OUTRO}</p>
@@ -1165,25 +1150,28 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
         <div style={styles.sheetBody}>
           <h2 style={styles.sheetTitle}>Ihre Ergebnisse im Detail</h2>
           <p style={styles.sheetIntro}>
-            Die zwei höchsten und die zwei tiefsten Bereichsergebnisse werden gegenübergestellt. Die Position ist keine Wertung: Massgebend ist immer die tatsächliche Einstufung des jeweiligen Bereichs.
+            Dargestellt sind die zwei höchsten und die zwei tiefsten Ihrer fünf
+            Bereichsergebnisse. Die Einstufung jeder Karte richtet sich nach dem tatsächlichen
+            Wert, nicht nach der Spalte. Bei einer Einstufung von Solide oder Stark werden keine
+            Massnahmen empfohlen.
           </p>
 
           <div style={styles.strengthGrid}>
             <div style={styles.strengthCol}>
-              <div style={{ ...styles.colTitle, color: GREEN }}>
+              <div style={styles.colTitle}>
                 <TrendingUp size={15} style={{ marginRight: 6 }} /> Stärkste Bereiche
               </div>
               <div style={styles.colStack}>
-                {strengths.map((s) => <AreaCard key={s.id} area={s} />)}
+                {strengths.map((s) => <AreaCard key={s.id} area={s} showPriority={false} />)}
               </div>
             </div>
 
             <div style={styles.strengthCol}>
-              <div style={{ ...styles.colTitle, color: RED }}>
-                <TrendingDown size={15} style={{ marginRight: 6 }} /> Grösstes Potenzial
+              <div style={styles.colTitle}>
+                <Target size={15} style={{ marginRight: 6 }} /> Grösstes Potenzial
               </div>
               <div style={styles.colStack}>
-                {weaknesses.map((s) => <AreaCard key={s.id} area={s} />)}
+                {weaknesses.map((s) => <AreaCard key={s.id} area={s} showPriority />)}
               </div>
             </div>
           </div>
@@ -1200,9 +1188,12 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
             anpacken sollen.
           </p>
           <p style={styles.sheetIntro}>
-            In einem kostenlosen 45-minütigen Gespräch mit einem Adlatus Senior Expert können Sie Ihre Ergebnisse einordnen, erste Prioritäten setzen und mögliche Handlungsimpulse besprechen. Unsere Beraterinnen und Berater bringen langjährige Führungs- und Praxiserfahrung aus der Wirtschaft mit.
+            Im Gespräch gehen Sie Ihre Ergebnisse durch, unterscheiden zwischen dringend und wichtig
+            und fixieren zwei bis drei Schritte, die in Ihrer Situation wirklich etwas bewegen.
+            Unsere Beraterinnen und Berater bringen langjährige Führungserfahrung aus der
+            Wirtschaft mit – sie kennen diese Situationen aus der Praxis.
           </p>
-          <p style={styles.sheetHighlight}>Das 45-minütige Erstgespräch ist kostenlos.</p>
+          <p style={styles.sheetHighlight}>Das Erstgespräch ist kostenlos und unverbindlich.</p>
 
           <div style={styles.contactBox}>
             <Wordmark compact />
@@ -1214,50 +1205,51 @@ function Report({ displayName, date, catScores, overallAvg, overallPct, overallT
             <div style={styles.contactLine}>{CONTACT.phone}</div>
             <div style={styles.contactLine}>{CONTACT.mail}</div>
           </div>
-          {criticals.length > 0 && (
-            <p style={{ ...styles.sheetIntro, marginTop: 20 }}>Auf den folgenden Seiten finden Sie – sofern vorhanden – einzelne Themen, die aufgrund Ihrer Antworten näher betrachtet werden sollten.</p>
-          )}
         </div>
         <Foot n={4} />
       </section>
 
-      {/* ───────────── Seiten 5 ff. — Themen zur näheren Betrachtung ───── */}
-      {criticalPages.map((page, pi) => {
-        let lastVal = null;
-        return (
-          <section className="a4" style={styles.sheet} key={`crit-${pi}`}>
-            <div style={styles.sheetBody}>
-              <h2 style={styles.sheetTitle}>Themen zur näheren Betrachtung</h2>
-              <p style={styles.sheetIntro}>
-                Einzelne Bewertungen von 1 oder 2 werden zusätzlich hervorgehoben, damit wichtige Themen unabhängig vom Gesamtergebnis sichtbar bleiben.
+      {/* ────────────────── Seiten 5 ff. — Kritische Antworten ────────────── */}
+      {criticalPages.map((page, pi) => (
+        <section className="a4" style={styles.sheet} key={`crit-${pi}`}>
+          <div style={styles.sheetBody}>
+            <div style={{
+              ...styles.critBox,
+              background: page.length ? tint("#C1392B", 0.045) : "#FBF9F3",
+              borderColor: page.length ? tint("#C1392B", 0.35) : LINE,
+            }}>
+              <h2 style={styles.critBoxTitle}>
+                Kritische Einzelantworten{criticalPages.length > 1 ? ` (${pi + 1}/${criticalPages.length})` : ""}
+              </h2>
+              <p style={styles.critBoxNote}>
+                Nur Fragen mit einer Bewertung von 1 oder 2 werden hier aufgeführt. Die Nummerierung
+                bezieht sich auf unseren umfangreichen Fragenkatalog, aus dem diese 15 Fragen
+                sorgfältig ausgewählt wurden. Bei vielen Treffern wird dieser Abschnitt automatisch
+                auf Folgeseiten fortgesetzt.
               </p>
-              <div style={styles.critList}>
-                {page.map((q) => {
-                  const heading = q.val !== lastVal;
-                  lastVal = q.val;
-                  const c = CRITICAL_TEXT[q.nr];
-                  return (
-                    <React.Fragment key={`${q.catId}-${q.qIndex}`}>
-                      {heading && (
-                        <div style={{ ...styles.critGroupTitle, color: q.val === 1 ? "#C1392B" : "#D9822B" }}>
-                          <span style={{ ...styles.critDot, background: q.val === 1 ? "#C1392B" : "#D9822B" }} />
-                          {q.val === 1 ? "Kritische Einzelpunkte" : "Zu prüfende Einzelpunkte"}
-                        </div>
-                      )}
-                      <div className="critical-item" style={styles.critItem}>
-                        <div style={styles.critCat}>{q.catName} · {q.keyword}</div>
-                        <div style={styles.critQuestion}>{q.text}</div>
-                        <div style={styles.critInterpretation}>{c?.[String(q.val)]}</div>
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
+
+              {page.length === 0 ? (
+                <div style={styles.noCritical}>
+                  <Check size={15} color="#1F6B3A" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>
+                    Keine Ihrer 15 Antworten lag im kritischen Bereich (1 oder 2) — ein durchgehend{" "}
+                    {overallTier.key === "high" ? "starkes" : "solides"} Bild.
+                  </span>
+                </div>
+              ) : page.map((q) => (
+                <div key={`${q.catId}-${q.qIndex}`} style={styles.critRow}>
+                  <div style={styles.critCat}>{q.catName.toUpperCase()} · NR. {q.nr}</div>
+                  <div style={styles.critMain}>
+                    <span style={styles.critText}>{q.text}</span>
+                    <span style={styles.critVal}>{q.val} von 5</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Foot n={5 + pi} />
-          </section>
-        );
-      })}
+          </div>
+          <Foot n={5 + pi} />
+        </section>
+      ))}
 
       {/* ─────────────────── Bedienleiste (nicht im Druck) ────────────────── */}
       <div className="no-print" style={styles.reportBar}>
@@ -1284,7 +1276,7 @@ function tint(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function AreaCard({ area }) {
+function AreaCard({ area, showPriority }) {
   const t = tierFor(area.avg);
   const block = area[t.key];
   const withActions = showsActions(t.key);
@@ -1296,11 +1288,13 @@ function AreaCard({ area }) {
     }}>
       <div style={styles.areaName}>{area.name}</div>
       <div style={styles.areaScore}>{fmt(area.avg)} von 5 · <span style={{ color: t.color, fontWeight: 600 }}>{t.label}</span></div>
-      
+      {showPriority && withActions && (
+        <div style={{ ...styles.priorityTag, color: t.color }}>{PRIORITY_LABEL[t.key].toUpperCase()}</div>
+      )}
       <div style={styles.areaSituation}>{block.situation}</div>
       {withActions && (
         <>
-          <div style={styles.actionHead}>Mögliche Handlungsimpulse</div>
+          <div style={styles.actionHead}>Empfohlene Massnahmen — {block.timeframe}</div>
           {block.actions.map((a, i) => (
             <div key={i} style={styles.actionRow}>
               <Check size={12} color={t.color} style={{ flexShrink: 0, marginTop: 3 }} />
@@ -1493,8 +1487,6 @@ const PAPER = "#FDFBF6";
 const INK = "#3A4048";
 const MUTED = "#8C8C84";
 const LINE = "#E4DFD2";
-const GREEN = "#1F6B3A";
-const RED = "#C1392B";
 
 const styles = {
   page: { minHeight: "100vh", background: CREAM, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif", color: INK },
@@ -1662,13 +1654,6 @@ const styles = {
   contactName: { fontSize: "calc(18 * var(--rs))", fontWeight: 700, color: INK, marginTop: 2 },
   contactLine: { fontSize: "calc(13.5 * var(--rs))", color: "#5C6169", marginTop: 3 },
 
-
-  critList: { marginTop: 8 },
-  critGroupTitle: { display: "flex", alignItems: "center", gap: 7, fontSize: "calc(13 * var(--rs))", fontWeight: 700, margin: "14px 0 4px" },
-  critDot: { width: 9, height: 9, borderRadius: "50%", flexShrink: 0 },
-  critItem: { padding: "7px 0 8px", borderBottom: `1px solid ${LINE}`, breakInside: "avoid", pageBreakInside: "avoid" },
-  critQuestion: { fontSize: "calc(10.5 * var(--rs))", lineHeight: 1.42, fontStyle: "italic", color: INK, marginTop: 2 },
-  critInterpretation: { fontSize: "calc(10 * var(--rs))", lineHeight: 1.42, color: "#5C6169", marginTop: 3 },
   critBox: { border: "1px solid", borderRadius: 12, padding: "20px 22px" },
   critBoxTitle: { color: BLUE, fontSize: "calc(20 * var(--rs))", fontWeight: 700, margin: "0 0 9px", textAlign: "center" },
   critBoxNote: { fontSize: "calc(12 * var(--rs))", lineHeight: 1.62, color: MUTED, margin: "0 auto 16px", textAlign: "center", maxWidth: "132mm" },
@@ -1726,7 +1711,6 @@ const globalCss = `
       print-color-adjust: exact !important;
       color-adjust: exact !important;
     }
-    .critical-item { break-inside: avoid !important; page-break-inside: avoid !important; }
     .no-print { display: none !important; }
     .dev-only { display: none !important; }
 
