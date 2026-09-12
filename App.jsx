@@ -59,7 +59,7 @@ const LOGO_SRC_BACONFISA_LIGHT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA
    kann ihn selbst umstellen. Die Absicherung liegt in der schriftlichen
    Vereinbarung und darin, wer den Betrieb in der Hand hat.
    ══════════════════════════════════════════════════════════════════════════ */
-const MARKE = "adlatus";          // "adlatus" oder "ba-confisa"
+const MARKE = "ba-confisa";          // "adlatus" oder "ba-confisa"
 
 const MARKEN = {
   adlatus: {
